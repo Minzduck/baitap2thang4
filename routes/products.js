@@ -74,7 +74,7 @@ router.get('/:id', async function (req, res, next) {
 //CREATE UPDATE DELETE
 router.post('/', async function (req, res) {
     let session = await mongoose.startSession();
-    let transaction = session.startTransaction()
+    session.startTransaction()
     try {
         let newProduct = new productModel({
             title: req.body.title,
@@ -97,11 +97,11 @@ router.post('/', async function (req, res) {
         await newInventory.save({ session })
         await newInventory.populate('product')
         await session.commitTransaction();
-        session.endSession()
+        await session.endSession()
         res.send(newInventory)
     } catch (error) {
         await session.abortTransaction();
-        session.endSession()
+        await session.endSession()
         res.status(404).send(error.message)
     }
 })
