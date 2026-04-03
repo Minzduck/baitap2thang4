@@ -12,7 +12,7 @@ let cartModel = require('../schemas/carts')
 
 router.post('/register', RegisterValidator, validatedResult, async function (req, res, next) {
     let session = await mongoose.startSession();
-    session.startTransaction()
+    // session.startTransaction()
     try {
         let { username, password, email } = req.body;
         let newUser = await userController.CreateAnUser(
@@ -21,14 +21,14 @@ router.post('/register', RegisterValidator, validatedResult, async function (req
         let newCart = new cartModel({
             user: newUser._id
         })
-        await newCart.save({ session });
+        await newCart.save(/* { session } */);
         await newCart.populate('user');
-        await session.commitTransaction()
-        session.endSession()
+        // await session.commitTransaction()
+        // session.endSession()
         res.send(newCart)
     } catch (error) {
-        await session.abortTransaction()
-        session.endSession()
+        // await session.abortTransaction()
+        // session.endSession()
         res.status(404).send(error.message)
     }
 })
@@ -55,7 +55,7 @@ router.post('/login', async function (req, res, next) {
                 httpOnly: true,
                 secure: false
             })
-            res.send(token)
+            res.send({ token, user })
         } else {
             user.loginCount++;
             if (user.loginCount == 3) {
